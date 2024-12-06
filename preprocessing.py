@@ -90,3 +90,7 @@ for sentence in pdf['processed_lyrics']:
 vocab = set(tokens)
 vocab_size = len(vocab)
 print("Vocabulary Size:", vocab_size)
+
+processed_lyrics_df.to_csv('/kaggle/working/processed_lyrics.csv', index=False)
+
+print("Processed lyrics have been saved to 'processed_lyrics.csv'.")
