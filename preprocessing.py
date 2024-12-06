@@ -76,3 +76,17 @@ pdf['processed_lyrics'] = pdf['processed_lyrics'].str.replace(r'\b(intro|verse)\
 
 
 print(pdf[['processed_lyrics']].head())
+
+pdf['processed_lyrics'] = pdf['processed_lyrics'].str.replace(r'\b(intro|verse)\b', '', case=False, regex=True)
+
+pdf['processed_lyrics'] = pdf['processed_lyrics'].fillna('')
+
+tokens = []
+for sentence in pdf['processed_lyrics']:
+    sentence = sentence.lower()
+    sentence = re.sub(r'[^\w\s]', '', sentence)
+    tokens.extend(sentence.split())
+
+vocab = set(tokens)
+vocab_size = len(vocab)
+print("Vocabulary Size:", vocab_size)
