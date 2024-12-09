@@ -1,6 +1,8 @@
 import torch
 import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import warnings
+warnings.filterwarnings("ignore")
 
 model_name = "t5-small"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -16,22 +18,14 @@ def generate_lyrics_t5(emotion: str, seed_text: str, min_words: int = 75):
         emotion_lyrics = ""
     
     prompt = (
-        f"Write a meaningful, rhythmic song about {emotion}, "
-        f"starting with this: {seed_text}. Use this as inspiration: {emotion_lyrics}. "
+        f"{emotion}, "
+        f"{seed_text}.{emotion_lyrics}. "
     )
     
     input_ids = tokenizer.encode(prompt, return_tensors='pt')
 
     with torch.no_grad():
-        output = model.generate(
-            input_ids,
-            max_new_tokens=200,
-            num_beams=5,
-            no_repeat_ngram_size=2,
-            temperature=0.7,
-            length_penalty=1.2,
-            early_stopping=True
-        )
+        output = model.generate(input_ids,max_new_tokens=200,num_beams=5,no_repeat_ngram_size=2,temperature=0.7,length_penalty=1.2,early_stopping=True)
 
     generated_lyrics = tokenizer.decode(output[0], skip_special_tokens=True)
     
@@ -40,15 +34,7 @@ def generate_lyrics_t5(emotion: str, seed_text: str, min_words: int = 75):
         while word_count < min_words:
             prompt = generated_lyrics
             input_ids = tokenizer.encode(prompt, return_tensors='pt')
-            output = model.generate(
-                input_ids,
-                max_new_tokens=150,
-                num_beams=5,
-                no_repeat_ngram_size=2,
-                temperature=0.7,
-                length_penalty=1.2,
-                early_stopping=True
-            )
+            output = model.generate(input_ids,max_new_tokens=150,num_beams=5,no_repeat_ngram_size=2,temperature=0.7,length_penalty=1.2,early_stopping=True)
             generated_lyrics += " " + tokenizer.decode(output[0], skip_special_tokens=True)
             word_count = len(generated_lyrics.split())
     
@@ -56,12 +42,12 @@ def generate_lyrics_t5(emotion: str, seed_text: str, min_words: int = 75):
     return formatted_lyrics
 
 if __name__ == "__main__":
-    emotion = input("Enter the emotion (e.g., sadness, joy, love): ").strip().lower()
+    emotion = input("Enter the emotion: ").strip().lower()
     
-    seed_text = input("Enter a seed text to inspire the lyrics: ").strip()
+    seed_text = input("Enter a seed text: ").strip()
     
     if emotion not in df['emotion'].unique():
-        print(f"Emotion '{emotion}' not found in the dataset. Please try again with a valid emotion.")
+        print(f"Emotion '{emotion}' not found in the dataset. Enter valid emotion.")
     else:
         generated_lyrics = generate_lyrics_t5(emotion, seed_text)
         print(f"Generated Lyrics for emotion '{emotion}' with seed text '{seed_text}':\n {seed_text} {generated_lyrics}")
