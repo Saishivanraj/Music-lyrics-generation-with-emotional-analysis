@@ -18,13 +18,7 @@ def generate_lyrics(emotion: str, min_words: int = 75):
     input_ids = tokenizer.encode(prompt, return_tensors='pt')
 
     with torch.no_grad():
-        output = model.generate(
-            input_ids,
-            max_new_tokens=150,
-            num_return_sequences=1,
-            num_beams=5,
-            no_repeat_ngram_size=2
-        )
+        output = model.generate(input_ids,max_new_tokens=150,num_return_sequences=1,num_beams=5,no_repeat_ngram_size=2)
     
     generated_lyrics = tokenizer.decode(output[0], skip_special_tokens=True)
     
@@ -32,13 +26,7 @@ def generate_lyrics(emotion: str, min_words: int = 75):
     if word_count < min_words:
         while word_count < min_words:
             input_ids = tokenizer.encode(generated_lyrics + " [MASK]", return_tensors='pt')
-            output = model.generate(
-                input_ids,
-                max_new_tokens=150,
-                num_return_sequences=1,
-                num_beams=5,
-                no_repeat_ngram_size=2
-            )
+            output = model.generate(input_ids,max_new_tokens=150,num_return_sequences=1,num_beams=5,no_repeat_ngram_size=2)
             generated_lyrics += " " + tokenizer.decode(output[0], skip_special_tokens=True)
             word_count = len(generated_lyrics.split())
 
